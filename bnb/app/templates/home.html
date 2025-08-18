@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>BnB</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+
+        header {
+            background-color: #007BFF;
+            color: white;
+            padding: 15px 30px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .welcome {
+            font-size: 1.2em;
+            white-space: nowrap;
+        }
+
+        .search-container {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .search-bar {
+            display: flex;
+            align-items: center;
+        }
+
+        .search-bar input {
+            padding: 6px 12px;
+            border: none;
+            border-radius: 4px;
+            width: 280px;
+        }
+
+        .clear-search {
+            margin-left: 10px;
+            color: #007BFF;
+            text-decoration: none;
+            font-size: 0.9em;
+            padding: 6px 10px;
+            background-color: #f0f0f0;
+            border-radius: 4px;
+        }
+
+        .clear-search:hover {
+            background-color: #e0e0e0;
+        }
+
+        .right-buttons {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .profile-button,
+        .list-button,
+        .logout-button {
+            background-color: white;
+            color: #007BFF;
+            padding: 6px 12px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .profile-button:hover,
+        .list-button:hover,
+        .logout-button:hover {
+            background-color: #e6f0ff;
+        }
+
+        .container {
+            padding: 30px;
+        }
+
+        .property-card-link {
+            text-decoration: none;
+            color: inherit;
+            display: block;
+        }
+
+        .property-card {
+            display: flex;
+            justify-content: space-between; /* pushes text left, image right */
+            gap: 20px;
+            align-items: center;
+            border: 1px solid #ddd;
+            padding: 15px;
+            margin-bottom: 15px;
+            border-radius: 6px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            background-color: #fff;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .property-card:hover {
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            transform: translateY(-2px);
+        }
+
+        .property-image img {
+            width: 250px;
+            height: 150px;
+            object-fit: cover;
+            border-radius: 4px;
+        }
+
+        .property-info {
+            flex: 1;
+        }
+
+        .list-property-container {
+            display: flex;
+            justify-content: flex-end;
+            padding: 0 30px;
+            margin-top: 15px;
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <div class="welcome">Welcome, {{ current_user.username }}!</div>
+
+    <div class="search-container">
+        <form class="search-bar" method="GET" action="{{ url_for('auth.home') }}">
+            <input type="text" name="q" placeholder="Search properties..." value="{{ request.args.get('q', '') }}">
+            {% if request.args.get('q') %}
+                <a href="{{ url_for('auth.home') }}" class="clear-search">Clear</a>
+            {% endif %}
+        </form>
+    </div>
+
+    <div class="right-buttons">
+        <form method="GET" action="{{ url_for('profile.view_profile') }}">
+            <button class="profile-button">Profile</button>
+        </form>
+        <form method="POST" action="{{ url_for('auth.logout') }}">
+            <button class="logout-button">Logout</button>
+        </form>
+    </div>
+</header>
+
+<div class="list-property-container">
+    <form method="GET" action="{{ url_for('property.new_property') }}">
+        <button class="list-button">➕ List Property</button>
+    </form>
+</div>
+
+<div class="container">
+    <h3>Property Listings</h3>
+
+    {% if properties %}
+        {% for p in properties %}
+        <a href="{{ url_for('property.view_property', property_id=p.id) }}" class="property-card-link">
+            <div class="property-card">
+                
+                <div class="property-info">
+                    <h3>{{ p.title }}</h3>
+                    <p>{{ p.area }}, {{ p.city }}</p>
+                    <p><strong>${{ p.price }}</strong> per night</p>
+                    <p><strong>Status:</strong> {{ p.status }}</p>
+                    <p><strong>Max Guests:</strong> {{ p.max_guests }}</p>
+                </div>
+
+                {% if p.images and p.images|length > 0 %}
+                <div class="property-image">
+                    <img src="{{ url_for('static', filename='uploads/' + p.images[0].filename) }}" alt="{{ p.title }}">
+                </div>
+                {% endif %}
+
+            </div>
+        </a>
+        {% endfor %}
+    {% else %}
+        <p>No Property Listed.</p>
+    {% endif %}
+</div>
+
+</body>
+</html>

@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ property.title }} Details</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f7f9fc;
+        }
+        .container {
+            max-width: 900px;
+            margin: 30px auto;
+            padding: 30px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        .property-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        .price {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #007BFF;
+        }
+        .main-image {
+            width: 100%;
+            height: 400px;
+            object-fit: cover;
+            border-radius: 8px;
+            margin-bottom: 15px;
+        }
+        .gallery {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        .gallery img {
+            width: 150px;
+            height: 100px;
+            object-fit: cover;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        .gallery img:hover {
+            transform: scale(1.05);
+        }
+        .property-info {
+            line-height: 1.6;
+        }
+        .property-info p {
+            margin: 8px 0;
+        }
+        .property-info strong {
+            color: #333;
+        }
+        .back-button, .btn-book, .btn-edit {
+            display: inline-block;
+            margin-top: 20px;
+            padding: 10px 16px;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            transition: background-color 0.3s;
+        }
+        .back-button { background-color: #007BFF; }
+        .back-button:hover { background-color: #0056b3; }
+        .btn-book { background-color: #28a745; }
+        .btn-book:hover { background-color: #218838; }
+        .btn-edit { background-color: #ffc107; color: #212529; }
+        .btn-edit:hover { background-color: #e0a800; }
+        hr { border: 0; height: 1px; background-color: #eee; margin: 20px 0; }
+        .booking-section {
+            margin-top: 30px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+        .host-info {
+            margin: 20px 0;
+            padding: 15px;
+            background: #f0f8ff;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        .host-info img {
+            border-radius: 50%;
+            width: 80px;
+            height: 80px;
+            object-fit: cover;
+        }
+    </style>
+    <script>
+        function changeMainImage(src) {
+            document.getElementById("mainImage").src = src;
+        }
+    </script>
+</head>
+<body>
+<div class="container">
+    <div class="property-header">
+        <h1>{{ property.title }}</h1>
+        <span class="price">${{ property.price or 0 }}/night</span>
+    </div>
+
+    <!-- Main Image -->
+    {% if property.image_1 %}
+        <img id="mainImage" src="{{ url_for('static', filename='uploads/' ~ property.image_1) }}" 
+             alt="{{ property.title }}" class="main-image">
+    {% endif %}
+
+    <!-- Gallery -->
+    <div class="gallery">
+        {% for img in [property.image_1, property.image_2, property.image_3, property.image_4, property.image_5] if img %}
+            <img src="{{ url_for('static', filename='uploads/' ~ img) }}" 
+                 alt="Property photo" onclick="changeMainImage(this.src)">
+        {% endfor %}
+    </div>
+
+    <!-- Host Info -->
+    <div class="host-info">
+        {% if property.host.profile_photo %}
+            <img src="{{ url_for('static', filename='uploads/' ~ property.host.profile_photo) }}" 
+                 alt="{{ property.host.username }}">
+        {% endif %}
+        <p>Hosted by <strong>{{ property.host.username }}</strong></p>
+    </div>
+
+    <!-- Property Info -->
+    <div class="property-info">
+        <p><strong>Location:</strong> {{ property.location }}, {{ property.area }}, {{ property.city }}</p>
+        <p><strong>Max Guests:</strong> {{ property.max_guests }}</p>
+        <p><strong>Posted on:</strong> {{ property.created_at.strftime('%B %d, %Y') }}</p>
+        
+        <hr>
+        
+        <h3>Description</h3>
+        <p>{{ property.description }}</p>
+    </div>
+    
+    <!-- Booking/Edit -->
+    <div class="booking-section">
+        {% if current_user.id != property.host_id %}
+            <a href="{{ url_for('booking.book_property', property_id=property.id) }}" class="btn-book">Book Now</a>
+        {% else %}
+            <a href="{{ url_for('property.edit_property', property_id=property.id) }}" class="btn-edit">Edit Property</a>
+        {% endif %}
+    </div>
+    
+    <a href="{{ url_for('auth.home') }}" class="back-button">Back to Properties</a>
+</div>
+</body>
+</html>

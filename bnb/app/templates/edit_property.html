@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Edit {{ property.title }}</title>
+    <style>
+        body { font-family: Arial; background: #f7f9fc; }
+        .container { max-width: 800px; margin: 40px auto; padding: 30px; background: white; border-radius: 8px; }
+        .form-group { margin-bottom: 15px; }
+        label { display: block; font-weight: bold; margin-bottom: 5px; }
+        input, textarea { width: 100%; padding: 8px; border-radius: 4px; border: 1px solid #ddd; }
+        .btn-submit { background: #007BFF; color: white; padding: 10px 16px; border: none; border-radius: 5px; cursor: pointer; }
+        .btn-submit:hover { background: #0056b3; }
+        .back-button { display: inline-block; margin-top: 15px; padding: 8px 14px; background: #6c757d; color: white; text-decoration: none; border-radius: 5px; }
+        .back-button:hover { background: #5a6268; }
+        .current-images { display: flex; flex-wrap: wrap; gap: 15px; margin-top: 10px; }
+        .current-images img { width: 150px; height: 120px; object-fit: cover; border-radius: 6px; border: 1px solid #ddd; }
+        .image-box { position: relative; display: inline-block; }
+        .remove-checkbox { position: absolute; top: 5px; right: 5px; background: rgba(255,0,0,0.8); color: white; border: none; border-radius: 3px; padding: 3px 6px; cursor: pointer; font-size: 0.8rem; }
+        .error { color: red; font-size: 0.9rem; margin-top: 5px; }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>Edit Property</h1>
+    <form method="POST" enctype="multipart/form-data">
+        {{ form.hidden_tag() }}
+
+        <div class="form-group">
+            {{ form.title.label }} {{ form.title(class="form-control") }}
+            {% for error in form.title.errors %}<div class="error">{{ error }}</div>{% endfor %}
+        </div>
+
+        <div class="form-group">
+            {{ form.description.label }} {{ form.description(class="form-control", rows=4) }}
+            {% for error in form.description.errors %}<div class="error">{{ error }}</div>{% endfor %}
+        </div>
+
+        <div class="form-group">
+            {{ form.location.label }} {{ form.location(class="form-control") }}
+            {% for error in form.location.errors %}<div class="error">{{ error }}</div>{% endfor %}
+        </div>
+
+        <div class="form-group">
+            {{ form.area.label }} {{ form.area(class="form-control") }}
+            {% for error in form.area.errors %}<div class="error">{{ error }}</div>{% endfor %}
+        </div>
+
+        <div class="form-group">
+            {{ form.city.label }} {{ form.city(class="form-control") }}
+            {% for error in form.city.errors %}<div class="error">{{ error }}</div>{% endfor %}
+        </div>
+
+        <div class="form-group">
+            {{ form.price.label }} {{ form.price(class="form-control") }}
+            {% for error in form.price.errors %}<div class="error">{{ error }}</div>{% endfor %}
+        </div>
+
+        <div class="form-group">
+            {{ form.max_guests.label }} {{ form.max_guests(class="form-control") }}
+            {% for error in form.max_guests.errors %}<div class="error">{{ error }}</div>{% endfor %}
+        </div>
+
+        <!-- Show existing images -->
+        <div class="form-group">
+            <label>Current Images</label>
+            <div class="current-images">
+                {% for img in property.images %}
+                    <div class="image-box">
+                        <img src="{{ url_for('static', filename='uploads/' ~ img.filename) }}" alt="Property Image">
+                        <label>
+                            <input type="checkbox" name="remove_images" value="{{ img.id }}"> Remove
+                        </label>
+                    </div>
+                {% else %}
+                    <p>No images uploaded.</p>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- Upload new images -->
+        <div class="form-group">
+            {{ form.images.label }} 
+            {{ form.images(class="form-control", multiple=true) }}
+            <small>You can upload up to 5 images. Only the first one will show in property cards.</small>
+            {% for error in form.images.errors %}<div class="error">{{ error }}</div>{% endfor %}
+        </div>
+
+        <button type="submit" class="btn-submit">Update Property</button>
+    </form>
+
+    <a href="{{ url_for('property.view_property', property_id=property.id) }}" class="back-button">Back to Property</a>
+</div>
+</body>
+</html>

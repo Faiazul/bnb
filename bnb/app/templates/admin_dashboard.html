@@ -1,0 +1,118 @@
+<!-- templates/admin/dashboard.html -->
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Admin Dashboard</title>
+    <style>
+        table { border-collapse: collapse; width: 100%; margin-bottom: 20px; }
+        th, td { border: 1px solid #ddd; padding: 8px; }
+        th { background-color: #007bff; color: white; }
+        h2 { margin-top: 40px; }
+        a.btn { padding: 5px 10px; background: red; color: white; text-decoration: none; border-radius: 4px; }
+        .top-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        .logout-btn {
+            background: #dc3545;
+            padding: 8px 12px;
+            color: white;
+            text-decoration: none;
+            border-radius: 4px;
+        }
+        .logout-btn:hover { background: #c82333; }
+    </style>
+</head>
+<body>
+    <div class="top-bar">
+        <h1>Admin Dashboard</h1>
+        <a href="{{ url_for('auth.logout') }}" class="logout-btn">Logout</a>
+    </div>
+
+    <h2>Users</h2>
+    <table>
+        <tr><th>ID</th><th>Username</th><th>Email</th><th>Admin</th><th>Action</th></tr>
+        {% for user in users %}
+        <tr>
+            <td>{{ user.id }}</td>
+            <td>{{ user.username }}</td>
+            <td>{{ user.email }}</td>
+            <td>{{ 'Yes' if user.is_admin else 'No' }}</td>
+            <td><a href="{{ url_for('admin.delete_user', user_id=user.id) }}" class="btn">Delete</a></td>
+        </tr>
+        {% endfor %}
+    </table>
+
+    <h2>Properties</h2>
+    <table>
+        <tr>
+            <th>ID</th>
+            <th>Title</th>
+            <th>Location</th>
+            <th>Owner</th>
+            <th>Action</th>
+        </tr>
+        {% for property in properties %}
+        <tr>
+            <td>{{ property.id }}</td>
+            <td>{{ property.title }}</td>
+            <td>{{ property.location }}</td>
+            <td>{{ property.host.username if property.host else 'N/A' }}</td>
+            <td>
+                <a href="{{ url_for('admin.delete_property', property_id=property.id) }}" class="btn">Delete</a>
+            </td>
+        </tr>
+        {% endfor %}
+    </table>
+
+    <h2>Bookings</h2>
+    <table>
+        <tr>
+            <th>ID</th>
+            <th>Property</th>
+            <th>Guest</th>
+            <th>Host</th>
+            <th>Status</th>
+            <th>Action</th>
+        </tr>
+        {% for booking in bookings %}
+        <tr>
+            <td>{{ booking.id }}</td>
+            <td>{{ booking.property.title if booking.property else 'N/A' }}</td>
+            <td>{{ booking.guest.username if booking.guest else 'N/A' }}</td>
+            <td>{{ booking.property.host.username if booking.property and booking.property.host else 'N/A' }}</td>
+            <td>{{ booking.status }}</td>
+            <td>
+                <a href="{{ url_for('admin.delete_booking', booking_id=booking.id) }}" class="btn">Delete</a>
+            </td>
+        </tr>
+        {% endfor %}
+    </table>
+    <h2>Payments</h2>
+<table>
+    <tr>
+        <th>ID</th>
+        <th>Booking</th>
+        <th>Guest</th>
+        <th>Property</th>
+        <th>Amount</th>
+        <th>Status</th>
+        <th>Paid On</th>
+    </tr>
+    {% for payment in payments %}
+    <tr>
+        <td>{{ payment.id }}</td>
+        <td>{{ payment.booking.id }}</td>
+        <td>{{ payment.booking.guest.username if payment.booking.guest else 'N/A' }}</td>
+        <td>{{ payment.booking.property.title if payment.booking.property else 'N/A' }}</td>
+        <td>${{ "%.2f"|format(payment.amount) }}</td>
+        <td>{{ payment.status|capitalize }}</td>
+        <td>{{ payment.payment_date.strftime('%Y-%m-%d %H:%M') }}</td>
+    </tr>
+    {% endfor %}
+</table>
+
+</body>
+</html>

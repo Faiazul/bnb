@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Edit Profile</title>
+</head>
+<body>
+    <h2>Edit Profile</h2>
+    <form method="POST">
+        {{ form.hidden_tag() }}
+        {{ form.username.label }} {{ form.username() }}<br>
+        {{ form.bio.label }} {{ form.bio() }}<br>
+        {{ form.submit() }}
+    </form>
+    <a href="{{ url_for('profile.view_profile') }}">Back to Profile</a>
+</body>
+</html>

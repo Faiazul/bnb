@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>My Bookings</title>
+    <style>
+        
+        .booking-card {
+            display: flex;
+            margin-bottom: 20px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        .booking-image {
+            width: 200px;
+            height: 150px;
+            object-fit: cover;
+        }
+        .booking-content {
+            padding: 15px;
+            flex-grow: 1;
+        }
+        .booking-status {
+            float: right;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+        <h1>My Bookings</h1>
+        
+        {% if bookings %}
+            {% for booking in bookings %}
+            <div class="booking-card">
+                {% if booking.property.image_data %}
+                <img src="{{ booking.property.get_image_url() }}" 
+                     class="booking-image" 
+                     alt="{{ booking.property.title }}">
+                {% endif %}
+                
+                <div class="booking-content">
+                    <div class="booking-status status-{{ booking.status }}">
+                        {{ booking.status|upper }}
+                    </div>
+                    <h3>{{ booking.property.title }}</h3>
+                    <p>{{ booking.property.area }}, {{ booking.property.city }}</p>
+                    <p>{{ booking.check_in.strftime('%b %d, %Y') }} - {{ booking.check_out.strftime('%b %d, %Y') }}</p>
+                    <p><strong>Total:</strong> ${{ "%.2f"|format(booking.total_price) }}</p>
+                    <a href="{{ url_for('booking.view_booking', booking_id=booking.id) }}" 
+                       class="btn">View Details</a>
+                </div>
+            </div>
+            {% endfor %}
+        {% else %}
+            <div class="alert alert-info">
+                You don't have any bookings yet. 
+                <a href="{{ url_for('property.all_properties') }}">Browse properties</a> to get started!
+            </div>
+        {% endif %}
+    </div>
+    <a href="{{ url_for('auth.home') }}" class="btn" style="margin-left: 10px; background-color: #007BFF; color: white; padding: 8px 12px; border-radius: 4px; text-decoration: none;">
+        Back to Home
+    </a>
+
+</div>
+</body>
+</html>
