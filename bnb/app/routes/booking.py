@@ -8,6 +8,7 @@ from app.forms.booking_form import BookingForm
 from app import db
 from sqlalchemy import or_, and_
 from app.models.payment import Payment
+from app.models.notification import Notification
 
 booking_bp = Blueprint('booking', __name__)
 
@@ -50,6 +51,19 @@ def book_property(property_id):
                 db.session.add(booking)
                 db.session.commit()
                 flash('Booking successful!', 'success')
+                # Notify the renter
+                notification_renter = Notification(
+                    user_id=booking.guest_id,
+                    content=f"Your booking for '{booking.property.title}' is confirmed!"
+                )
+                # Notify the host
+                notification_host = Notification(
+                    user_id=booking.property.host_id,
+                    content=f"Your property '{booking.property.title}' was booked!"
+                )
+
+                db.session.add_all([notification_renter, notification_host])
+                db.session.commit()
                 return redirect(url_for('booking.view_booking', booking_id=booking.id))
 
     elif form.check_in.data and form.check_out.data:
@@ -96,6 +110,20 @@ def cancel_booking(booking_id):
         booking.status = 'cancelled'
         db.session.commit()
         flash('Booking cancelled', 'success')
+                # Notify the guest
+        notification_guest = Notification(
+            user_id=booking.guest_id,
+            content=f"Your booking for '{booking.property.title}' has been canceled."
+        )
+
+        # Notify the host
+        notification_host = Notification(
+            user_id=booking.property.host_id,
+            content=f"The booking by {booking.guest.username} for '{booking.property.title}' has been canceled."
+        )
+
+        db.session.add_all([notification_guest, notification_host])
+        db.session.commit()
     else:
         flash('Cannot cancel this booking', 'danger')
 
@@ -123,6 +151,20 @@ def pay_booking(booking_id):
     try:
         db.session.commit()
         flash('Payment successful! Booking confirmed.', 'success')
+        # Notify the guest
+        notification_guest = Notification(
+            user_id=payment.booking.guest_id,
+            content=f"Payment of ${payment.amount} for '{payment.booking.property.title}' confirmed!"
+        )
+
+        # Notify the host
+        notification_host = Notification(
+            user_id=payment.booking.property.host_id,
+            content=f"You received payment of ${payment.amount} for '{payment.booking.property.title}'!"
+        )
+
+        db.session.add_all([notification_guest, notification_host])
+        db.session.commit()
     except Exception as e:
         db.session.rollback()
         flash(f'Payment failed: {str(e)}', 'danger')

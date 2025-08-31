@@ -3,7 +3,7 @@ from flask_login import login_user, logout_user, login_required, current_user
 from app.models.user import User
 from app.forms.login_form import LoginForm
 from app import db
-
+from app.models.notification import Notification
 auth_bp = Blueprint('auth', __name__)
 @auth_bp.route('/')
 def index():
@@ -89,6 +89,6 @@ def home():
             ).all()
     else:
         properties = Property.query.all()
-
-    return render_template('home.html', properties=properties)
+    notifications = Notification.query.filter_by(user_id=current_user.id).order_by(Notification.timestamp.desc()).limit(10).all()
+    return render_template('home.html', properties=properties, notifications=notifications, query=query)
 

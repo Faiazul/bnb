@@ -33,6 +33,15 @@ def create_app():
     from app.routes.admin import admin_bp
     app.register_blueprint(admin_bp)
 
+    from app.routes.review import review_bp
+    app.register_blueprint(review_bp)
+
+    from app.routes.wishlist import wishlist_bp
+    app.register_blueprint(wishlist_bp)
+
+    from app.routes.message import message_bp
+    app.register_blueprint(message_bp, url_prefix='/messages')
+
     with app.app_context():
         db.create_all()
     

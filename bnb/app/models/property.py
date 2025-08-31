@@ -20,7 +20,13 @@ class Property(db.Model):
     bookings = db.relationship("Booking", back_populates="property_item", cascade="all, delete-orphan", passive_deletes=True)
     host = db.relationship("User", back_populates="hosted_properties", foreign_keys=[host_id])
     photos_rel = db.relationship('PropertyPhoto', back_populates='property', cascade="all, delete-orphan")
-
+    reviews = db.relationship('Review', back_populates='property', cascade='all, delete-orphan')
+    wishlisted_by = db.relationship("Wishlist", back_populates="property")
+    def average_rating(self):
+        if not self.reviews:
+            return None
+        return round(sum(r.rating for r in self.reviews) / len(self.reviews), 1)
+    
     def get_first_photo_url(self):
         if self.photos:
             return self.photos[0].get_url()

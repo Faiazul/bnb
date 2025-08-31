@@ -21,14 +21,26 @@
             color: white;
             text-decoration: none;
             border-radius: 4px;
+            margin-left: 10px;
         }
         .logout-btn:hover { background: #c82333; }
+        .inbox-btn {
+            background: #28a745;
+            padding: 8px 12px;
+            color: white;
+            text-decoration: none;
+            border-radius: 4px;
+        }
+        .inbox-btn:hover { background: #218838; }
     </style>
 </head>
 <body>
     <div class="top-bar">
         <h1>Admin Dashboard</h1>
-        <a href="{{ url_for('auth.logout') }}" class="logout-btn">Logout</a>
+        <div>
+            <a href="{{ url_for('message.inbox') }}" class="inbox-btn">📩 Inbox</a>
+            <a href="{{ url_for('auth.logout') }}" class="logout-btn">Logout</a>
+        </div>
     </div>
 
     <h2>Users</h2>
@@ -90,29 +102,30 @@
         </tr>
         {% endfor %}
     </table>
+
     <h2>Payments</h2>
-<table>
-    <tr>
-        <th>ID</th>
-        <th>Booking</th>
-        <th>Guest</th>
-        <th>Property</th>
-        <th>Amount</th>
-        <th>Status</th>
-        <th>Paid On</th>
-    </tr>
-    {% for payment in payments %}
-    <tr>
-        <td>{{ payment.id }}</td>
-        <td>{{ payment.booking.id }}</td>
-        <td>{{ payment.booking.guest.username if payment.booking.guest else 'N/A' }}</td>
-        <td>{{ payment.booking.property.title if payment.booking.property else 'N/A' }}</td>
-        <td>${{ "%.2f"|format(payment.amount) }}</td>
-        <td>{{ payment.status|capitalize }}</td>
-        <td>{{ payment.payment_date.strftime('%Y-%m-%d %H:%M') }}</td>
-    </tr>
-    {% endfor %}
-</table>
+    <table>
+        <tr>
+            <th>ID</th>
+            <th>Booking</th>
+            <th>Guest</th>
+            <th>Property</th>
+            <th>Amount</th>
+            <th>Status</th>
+            <th>Paid On</th>
+        </tr>
+        {% for payment in payments %}
+        <tr>
+            <td>{{ payment.id }}</td>
+            <td>{{ payment.booking.id }}</td>
+            <td>{{ payment.booking.guest.username if payment.booking.guest else 'N/A' }}</td>
+            <td>{{ payment.booking.property.title if payment.booking.property else 'N/A' }}</td>
+            <td>${{ "%.2f"|format(payment.amount) }}</td>
+            <td>{{ payment.status|capitalize }}</td>
+            <td>{{ payment.payment_date.strftime('%Y-%m-%d %H:%M') }}</td>
+        </tr>
+        {% endfor %}
+    </table>
 
 </body>
 </html>

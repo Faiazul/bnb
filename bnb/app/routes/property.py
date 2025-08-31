@@ -7,6 +7,7 @@ from app import db
 from app.routes.utils import allowed_file
 from flask import current_app
 from werkzeug.utils import secure_filename
+from app.forms.review_form import ReviewForm
 
 property_bp = Blueprint('property', __name__, template_folder='templates')
 
@@ -59,7 +60,8 @@ def new_property():
 @login_required
 def view_property(property_id):
     property = Property.query.get_or_404(property_id)
-    return render_template('property_details.html', property=property)
+    form = ReviewForm()
+    return render_template('property_details.html', property=property, form=form)
 
 from io import BytesIO
 from flask import send_file,abort

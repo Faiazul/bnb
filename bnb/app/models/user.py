@@ -24,7 +24,11 @@ class User(UserMixin, db.Model):
     # Relationships
     hosted_properties = db.relationship('Property',back_populates='host',foreign_keys='Property.host_id',cascade='all, delete-orphan')
     bookings = db.relationship('Booking',back_populates='guest',foreign_keys='Booking.guest_id',cascade='all, delete-orphan')
+    reviews = db.relationship('Review', back_populates='user', cascade='all, delete-orphan')
+    wishlist = db.relationship("Wishlist", back_populates="user", cascade="all, delete-orphan")
 
+    def wishlist_property_ids(self):
+        return [w.property_id for w in self.wishlist]
     def set_password(self, password):
         self.password_hash = generate_password_hash(password)
     

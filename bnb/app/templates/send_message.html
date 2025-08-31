@@ -1,0 +1,10 @@
+<h2>Message {{ receiver.username }}</h2>
+
+<form method="POST">
+    {{ form.hidden_tag() }}
+    {{ form.content.label }}<br>
+    {{ form.content(rows=4) }}<br><br>
+    {{ form.submit() }}
+</form>
+
+<a href="{{ url_for('message.inbox') }}">Back to Inbox</a>

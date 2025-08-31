@@ -4,12 +4,50 @@
     <meta charset="UTF-8">
     <title>{{ property.title }} Details</title>
     <style>
+        .flash-messages { 
+            margin: 10px auto; 
+            max-width: 800px; 
+            position: relative;
+        }
+
+        .flash { 
+            padding: 10px 35px 10px 10px; 
+            margin-bottom: 8px; 
+            border-radius: 5px; 
+            position: relative; 
+            animation: fadeOut 0s ease-in 3s forwards;
+        }
+
+        .flash-success { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+        .flash-danger  { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+        .flash-warning { background: #fff3cd; color: #856404; border: 1px solid #ffeeba; }
+        .flash-info    { background: #d1ecf1; color: #0c5460; border: 1px solid #bee5eb; }
+
+        .flash .close {
+            position: absolute;
+            right: 10px;
+            top: 5px;
+            text-decoration: none;
+            font-size: 18px;
+            color: inherit;
+            cursor: pointer;
+        }
+
+        .flash .close:hover {
+            color: black;
+        }
+
+        @keyframes fadeOut {
+            to { opacity: 0; visibility: hidden; }
+        }
+        
         body {
             font-family: Arial, sans-serif;
             margin: 0;
             padding: 0;
             background-color: #f7f9fc;
         }
+        
         .container {
             max-width: 900px;
             margin: 30px auto;
@@ -18,6 +56,7 @@
             border-radius: 8px;
             box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
         }
+        
         .property-header {
             display: flex;
             justify-content: space-between;
@@ -25,11 +64,13 @@
             margin-bottom: 20px;
             flex-wrap: wrap;
         }
+        
         .price {
             font-size: 1.5rem;
             font-weight: bold;
             color: #007BFF;
         }
+        
         .main-image {
             width: 100%;
             height: 400px;
@@ -37,12 +78,14 @@
             border-radius: 8px;
             margin-bottom: 15px;
         }
+        
         .gallery {
             display: flex;
             gap: 10px;
             margin-bottom: 20px;
             flex-wrap: wrap;
         }
+        
         .gallery img {
             width: 150px;
             height: 100px;
@@ -51,19 +94,24 @@
             cursor: pointer;
             transition: transform 0.2s;
         }
+        
         .gallery img:hover {
             transform: scale(1.05);
         }
+        
         .property-info {
             line-height: 1.6;
         }
+        
         .property-info p {
             margin: 8px 0;
         }
+        
         .property-info strong {
             color: #333;
         }
-        .back-button, .btn-book, .btn-edit {
+        
+        .back-button, .btn-book, .btn-edit, .btn-message {
             display: inline-block;
             margin-top: 20px;
             padding: 10px 16px;
@@ -71,20 +119,35 @@
             text-decoration: none;
             border-radius: 5px;
             transition: background-color 0.3s;
+            border: none;
+            cursor: pointer;
+            font-size: 14px;
+            margin-right: 10px;
         }
+        
         .back-button { background-color: #007BFF; }
         .back-button:hover { background-color: #0056b3; }
         .btn-book { background-color: #28a745; }
         .btn-book:hover { background-color: #218838; }
         .btn-edit { background-color: #ffc107; color: #212529; }
         .btn-edit:hover { background-color: #e0a800; }
-        hr { border: 0; height: 1px; background-color: #eee; margin: 20px 0; }
+        .btn-message { background-color: #6c757d; }
+        .btn-message:hover { background-color: #5a6268; }
+        
+        hr { 
+            border: 0; 
+            height: 1px; 
+            background-color: #eee; 
+            margin: 20px 0; 
+        }
+        
         .booking-section {
             margin-top: 30px;
             padding: 20px;
             background: #f8f9fa;
             border-radius: 8px;
         }
+        
         .host-info {
             margin: 20px 0;
             padding: 15px;
@@ -94,71 +157,269 @@
             align-items: center;
             gap: 15px;
         }
+        
         .host-info img {
             border-radius: 50%;
             width: 80px;
             height: 80px;
             object-fit: cover;
         }
+        
+        .review {
+            margin: 15px 0;
+            padding: 12px;
+            background: #f9f9f9;
+            border-left: 4px solid #007BFF;
+            border-radius: 5px;
+        }
+        
+        .review strong {
+            color: #007BFF;
+        }
+        
+        .review-form {
+            margin: 20px 0;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+        
+        .review-form textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            margin-bottom: 10px;
+            resize: vertical;
+            min-height: 100px;
+        }
+        
+        .review-form select {
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            margin-bottom: 10px;
+        }
+        
+        .review-form button {
+            background-color: #007BFF;
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        
+        .review-form button:hover {
+            background-color: #0056b3;
+        }
+        
+        .message-section {
+            margin-top: 20px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+        
+        .message-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        
+        .host-placeholder {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background-color: #ddd;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #777;
+            font-size: 24px;
+        }
     </style>
     <script>
         function changeMainImage(src) {
             document.getElementById("mainImage").src = src;
         }
+        
+        // Close flash messages when X is clicked
+        document.addEventListener('DOMContentLoaded', function() {
+            var closeButtons = document.querySelectorAll('.flash .close');
+            closeButtons.forEach(function(button) {
+                button.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    this.parentElement.style.display = 'none';
+                });
+            });
+        });
     </script>
 </head>
 <body>
-<div class="container">
-    <div class="property-header">
-        <h1>{{ property.title }}</h1>
-        <span class="price">${{ property.price or 0 }}/night</span>
-    </div>
-
-    <!-- Main Image -->
-    {% if property.image_1 %}
-        <img id="mainImage" src="{{ url_for('static', filename='uploads/' ~ property.image_1) }}" 
-             alt="{{ property.title }}" class="main-image">
-    {% endif %}
-
-    <!-- Gallery -->
-    <div class="gallery">
-        {% for img in [property.image_1, property.image_2, property.image_3, property.image_4, property.image_5] if img %}
-            <img src="{{ url_for('static', filename='uploads/' ~ img) }}" 
-                 alt="Property photo" onclick="changeMainImage(this.src)">
-        {% endfor %}
-    </div>
-
-    <!-- Host Info -->
-    <div class="host-info">
-        {% if property.host.profile_photo %}
-            <img src="{{ url_for('static', filename='uploads/' ~ property.host.profile_photo) }}" 
-                 alt="{{ property.host.username }}">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            <div class="flash-messages">
+                {% for category, message in messages %}
+                    <div class="flash flash-{{ category }}">
+                        {{ message }}
+                        <a href="#" class="close">&times;</a>
+                    </div>
+                {% endfor %}
+            </div>
         {% endif %}
-        <p>Hosted by <strong>{{ property.host.username }}</strong></p>
-    </div>
+    {% endwith %}
 
-    <!-- Property Info -->
-    <div class="property-info">
-        <p><strong>Location:</strong> {{ property.location }}, {{ property.area }}, {{ property.city }}</p>
-        <p><strong>Max Guests:</strong> {{ property.max_guests }}</p>
-        <p><strong>Posted on:</strong> {{ property.created_at.strftime('%B %d, %Y') }}</p>
-        
+    <div class="container">
+        <div class="property-header">
+            <h1>{{ property.title }}</h1>
+            <span class="price">${{ property.price or 0 }}/night</span>
+        </div>
+
+        <!-- Main Image -->
+        {% if property.image_1 %}
+            <img id="mainImage" src="{{ url_for('static', filename='uploads/' ~ property.image_1) }}" 
+                 alt="{{ property.title }}" class="main-image">
+        {% endif %}
+
+        <!-- Gallery -->
+        <div class="gallery">
+            {% for img in [property.image_1, property.image_2, property.image_3, property.image_4, property.image_5] if img %}
+                <img src="{{ url_for('static', filename='uploads/' ~ img) }}" 
+                     alt="Property photo" onclick="changeMainImage(this.src)">
+            {% endfor %}
+        </div>
+
+        <!-- Host Info -->
+        <div class="host-info">
+            {% if property.host.profile_photo %}
+                <img src="{{ url_for('static', filename='uploads/' ~ property.host.profile_photo) }}" 
+                     alt="{{ property.host.username }}">
+            {% else %}
+                <div class="host-placeholder">{{ property.host.username[0]|upper }}</div>
+            {% endif %}
+            <div>
+                <p>Hosted by <strong>{{ property.host.username }}</strong></p>
+                <!-- Removed the reference to created_at which doesn't exist in User model -->
+            </div>
+        </div>
+
+        <!-- Property Info -->
+        <div class="property-info">
+            <p><strong>Location:</strong> {{ property.location }}, {{ property.area }}, {{ property.city }}</p>
+            <p><strong>Max Guests:</strong> {{ property.max_guests }}</p>
+            <p><strong>Posted on:</strong> {{ property.created_at.strftime('%B %d, %Y') }}</p>
+            
+            <hr>
+            
+            <h3>Description</h3>
+            <p>{{ property.description }}</p>
+        </div>
+
+        <!-- Reviews Section -->
         <hr>
+        <h3>Reviews</h3>
         
-        <h3>Description</h3>
-        <p>{{ property.description }}</p>
-    </div>
-    
-    <!-- Booking/Edit -->
-    <div class="booking-section">
-        {% if current_user.id != property.host_id %}
-            <a href="{{ url_for('booking.book_property', property_id=property.id) }}" class="btn-book">Book Now</a>
+        {% if property.average_rating() %}
+            <p><strong>Average Rating:</strong> ⭐ {{ property.average_rating() }}/5 ({{ property.reviews|length }} reviews)</p>
         {% else %}
-            <a href="{{ url_for('property.edit_property', property_id=property.id) }}" class="btn-edit">Edit Property</a>
+            <p>No reviews yet.</p>
         {% endif %}
+
+        <!-- Add Review Form -->
+        {% if current_user.is_authenticated and current_user.id != property.host_id %}
+            <div class="review-form">
+                <h4>Add Your Review</h4>
+                <form method="POST" action="{{ url_for('review.add_review', property_id=property.id) }}">
+                    <div>
+                        <label for="rating">Rating:</label>
+                        <select name="rating" id="rating" required>
+                            <option value="">Select a rating</option>
+                            <option value="5">⭐⭐⭐⭐⭐ (5)</option>
+                            <option value="4">⭐⭐⭐⭐ (4)</option>
+                            <option value="3">⭐⭐⭐ (3)</option>
+                            <option value="2">⭐⭐ (2)</option>
+                            <option value="1">⭐ (1)</option>
+                        </select>
+                    </div>
+                    <div>
+                        <textarea name="comment" placeholder="Write your review..." required></textarea>
+                    </div>
+                    <button type="submit">Submit Review</button>
+                </form>
+            </div>
+        {% endif %}
+
+        <!-- Reviews List -->
+        {% for review in property.reviews %}
+            <div class="review">
+                <strong>{{ review.user.username }}</strong> 
+                ⭐ {{ review.rating }}  
+                <p>{{ review.comment }}</p>
+                <small>Posted on {{ review.created_at.strftime('%B %d, %Y') }}</small>
+
+                {% if current_user.is_authenticated and review.user_id == current_user.id %}
+                    <div style="margin-top: 10px;">
+                        <!-- Edit -->
+                        <a href="{{ url_for('review.edit_review', review_id=review.id) }}" style="margin-right: 10px;">Edit</a>
+
+                        <!-- Delete -->
+                        <form method="POST" action="{{ url_for('review.delete_review', review_id=review.id) }}" style="display:inline;">
+                            <button type="submit" onclick="return confirm('Are you sure you want to delete this review?')" 
+                                    style="background: none; border: none; color: #dc3545; text-decoration: underline; cursor: pointer;">
+                                Delete
+                            </button>
+                        </form>
+                    </div>
+                {% endif %}
+            </div>
+        {% endfor %}
+
+        <!-- Booking/Edit Section -->
+        <div class="booking-section">
+            {% if current_user.id != property.host_id %}
+                <a href="{{ url_for('booking.book_property', property_id=property.id) }}" class="btn-book">Book Now</a>
+            {% else %}
+                <a href="{{ url_for('property.edit_property', property_id=property.id) }}" class="btn-edit">Edit Property</a>
+            {% endif %}
+            
+            <a href="{{ url_for('auth.home') }}" class="back-button">Back to Properties</a>
+        </div>
+
+        <!-- Messaging Section -->
+        <div class="message-section">
+            <h3>Contact</h3>
+            
+            <!-- Renter: Show Message Owner button if booking is confirmed -->
+            {% if current_user.is_authenticated and current_user.id != property.host_id %}
+                {% set booking = property.bookings
+                    |selectattr("guest_id", "equalto", current_user.id)
+                    |selectattr("status", "equalto", "confirmed")
+                    |first %}
+                {% if booking %}
+                    <form method="GET" action="{{ url_for('message.message_booking', booking_id=booking.id) }}" style="display:inline;">
+                        <button type="submit" class="btn-message">💬 Message Owner</button>
+                    </form>
+                {% endif %}
+            {% endif %}
+
+            <!-- Owner: Show Message Renter buttons for each confirmed booking -->
+            {% if current_user.is_authenticated and current_user.id == property.host_id %}
+                <p>Message your renters:</p>
+                <div class="message-buttons">
+                    {% for booking in property.bookings %}
+                        {% if booking.status == 'confirmed' %}
+                            <form method="GET" action="{{ url_for('message.message_booking', booking_id=booking.id) }}">
+                                <button type="submit" class="btn-message">
+                                    💬 Message {{ booking.guest.username }}
+                                </button>
+                            </form>
+                        {% endif %}
+                    {% endfor %}
+                </div>
+            {% endif %}
+        </div>
     </div>
-    
-    <a href="{{ url_for('auth.home') }}" class="back-button">Back to Properties</a>
-</div>
 </body>
 </html>

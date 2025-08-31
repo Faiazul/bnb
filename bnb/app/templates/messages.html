@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Inbox</title>
+    <style>
+        .inbox-container { max-width: 800px; margin: 20px auto; }
+        .message-card { border: 1px solid #ddd; border-radius: 8px; padding: 12px; margin-bottom: 12px; }
+        .message-card h4 { margin: 0 0 5px 0; }
+        .btn { display: inline-block; padding: 6px 12px; border-radius: 4px; text-decoration: none; font-size: 14px; margin-top: 5px; }
+        .btn-primary { background: #007BFF; color: white; border: none; cursor: pointer; }
+        .btn-primary:hover { background: #0056b3; }
+        .reply-form { margin-top: 10px; }
+        textarea { width: 100%; height: 60px; border-radius: 6px; border: 1px solid #ccc; padding: 5px; }
+    </style>
+</head>
+<body>
+<div class="inbox-container">
+    <h2>Inbox</h2>
+
+    <!-- Message Admin Button -->
+    <a href="{{ url_for('message.message_admin') }}" class="btn btn-primary">💌 Message Admin</a>
+    <hr>
+
+    <!-- Messages -->
+    {% if messages %}
+        {% for msg in messages %}
+            <div class="message-card">
+                <h4>From: {{ msg.sender.username }} | To: {{ msg.receiver.username }}</h4>
+                <p>{{ msg.content }}</p>
+                <small>{{ msg.timestamp.strftime('%b %d, %Y %H:%M') }}</small>
+
+                <!-- Reply Form -->
+                <form method="POST" action="{{ url_for('message.reply', message_id=msg.id) }}" class="reply-form">
+                    <textarea name="content" placeholder="Write a reply..." required></textarea>
+                    <button type="submit" class="btn btn-primary">↩ Reply</button>
+                </form>
+            </div>
+        {% endfor %}
+    {% else %}
+        <p>No messages yet.</p>
+    {% endif %}
+
+    <!-- Additional: show message buttons for booked properties -->
+    {% if booked_properties %}
+        <hr>
+        <h3>Your Booked Properties</h3>
+        {% for booking in booked_properties %}
+            <form method="GET" action="{{ url_for('message.message_booking', booking_id=booking.id) }}">
+                <button type="submit" class="btn btn-primary">
+                    💬 Message {{ 'Property Owner' if current_user.id == booking.guest_id else 'Renter' }}
+                    - {{ booking.property.title }}
+                </button>
+            </form>
+        {% endfor %}
+    {% endif %}
+
+    {% if current_user.is_admin %}
+        <a href="{{ url_for('admin.dashboard') }}" class="back-button">⬅ Back to Admin Dashboard</a>
+    {% else %}
+        <a href="{{ url_for('auth.home') }}" class="back-button">⬅ Back to Properties</a>
+    {% endif %}
+</div>
+</body>
+</html>

@@ -4,6 +4,42 @@
     <meta charset="UTF-8">
     <title>BnB</title>
     <style>
+        .flash-messages { 
+    margin: 10px auto; 
+    max-width: 800px; 
+    position: relative;
+}
+
+.flash { 
+    padding: 10px 35px 10px 10px; 
+    margin-bottom: 8px; 
+    border-radius: 5px; 
+    position: relative; 
+    animation: fadeOut 0s ease-in 3s forwards;
+}
+
+.flash-success { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+.flash-danger  { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+.flash-warning { background: #fff3cd; color: #856404; border: 1px solid #ffeeba; }
+.flash-info    { background: #d1ecf1; color: #0c5460; border: 1px solid #bee5eb; }
+
+.flash .close {
+    position: absolute;
+    right: 10px;
+    top: 5px;
+    text-decoration: none;
+    font-size: 18px;
+    color: inherit;
+    cursor: pointer;
+}
+
+.flash .close:hover {
+    color: black;
+}
+
+@keyframes fadeOut {
+    to { opacity: 0; visibility: hidden; }
+}
         body {
             font-family: Arial, sans-serif;
             margin: 0;
@@ -17,6 +53,48 @@
             display: flex;
             align-items: center;
             justify-content: space-between;
+        }
+        .notifications-container {
+            position: relative;
+        }
+
+        .dropdown {
+            position: relative;
+            display: inline-block;
+        }
+
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            right: 0;
+            background-color: white;
+            min-width: 300px;
+            max-height: 300px;
+            overflow-y: auto;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+            z-index: 1000;
+            color: black; /* Added to ensure text is black */
+        }
+
+        .dropdown:hover .dropdown-content {
+            display: block;
+        }
+
+        .notification-item {
+            padding: 10px;
+            border-bottom: 1px solid #eee;
+            color: black; /* Ensure notification text is black */
+        }
+
+        .notification-item p {
+            margin: 0;
+            color: black; /* Explicitly set paragraph color */
+        }
+
+        .notification-item small {
+            color: #888; /* Keep timestamp slightly lighter */
         }
 
         .welcome {
@@ -130,6 +208,18 @@
     </style>
 </head>
 <body>
+{% with messages = get_flashed_messages(with_categories=true) %}
+  {% if messages %}
+    <div class="flash-messages">
+      {% for category, message in messages %}
+        <div class="flash flash-{{ category }}">
+          {{ message }}
+          <a href="#" class="close">&times;</a>
+        </div>
+      {% endfor %}
+    </div>
+  {% endif %}
+{% endwith %}
 
 <header>
     <div class="welcome">Welcome, {{ current_user.username }}!</div>
@@ -144,12 +234,37 @@
     </div>
 
     <div class="right-buttons">
+        <!-- Wishlist button -->
+        <form method="GET" action="{{ url_for('wishlist.view_wishlist') }}">
+            <button class="profile-button">❤️ Wishlist</button>
+        </form>
+
         <form method="GET" action="{{ url_for('profile.view_profile') }}">
             <button class="profile-button">Profile</button>
+        </form>
+        <form method="GET" action="{{ url_for('message.inbox') }}">
+            <button class="profile-button">📩 Inbox</button>
         </form>
         <form method="POST" action="{{ url_for('auth.logout') }}">
             <button class="logout-button">Logout</button>
         </form>
+        <div class="notifications-container">
+            <div class="dropdown">
+                <button class="profile-button">🔔 Notifications ({{ notifications|length }})</button>
+                <div class="dropdown-content">
+                    {% if notifications %}
+                        {% for n in notifications %}
+                            <div class="notification-item">
+                                <p>{{ n.content }}</p>
+                                <small>{{ n.timestamp.strftime('%b %d, %H:%M') }}</small>
+                            </div>
+                        {% endfor %}
+                    {% else %}
+                        <p style="padding: 10px; color: black;">No notifications yet.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
     </div>
 </header>
 
@@ -164,15 +279,20 @@
 
     {% if properties %}
         {% for p in properties %}
-        <a href="{{ url_for('property.view_property', property_id=p.id) }}" class="property-card-link">
-            <div class="property-card">
-                
+        <div class="property-card">
+            <a href="{{ url_for('property.view_property', property_id=p.id) }}" class="property-card-link">
                 <div class="property-info">
                     <h3>{{ p.title }}</h3>
                     <p>{{ p.area }}, {{ p.city }}</p>
                     <p><strong>${{ p.price }}</strong> per night</p>
                     <p><strong>Status:</strong> {{ p.status }}</p>
                     <p><strong>Max Guests:</strong> {{ p.max_guests }}</p>
+
+                    {% if p.average_rating() %}
+                        <p>⭐ {{ p.average_rating() }}/5 ({{ p.reviews|length }} reviews)</p>
+                    {% else %}
+                        <p>No ratings yet</p>
+                    {% endif %}
                 </div>
 
                 {% if p.images and p.images|length > 0 %}
@@ -180,9 +300,17 @@
                     <img src="{{ url_for('static', filename='uploads/' + p.images[0].filename) }}" alt="{{ p.title }}">
                 </div>
                 {% endif %}
+            </a>
 
-            </div>
-        </a>
+            <!-- Add to Wishlist Button -->
+            <form method="POST" action="{{ url_for('wishlist.add_to_wishlist', property_id=p.id) }}">
+                {% if current_user.is_authenticated and p.id in current_user.wishlist_property_ids() %}
+                    <button class="list-button" disabled>❤️ In Wishlist</button>
+                {% else %}
+                    <button class="list-button">❤️ Add to Wishlist</button>
+                {% endif %}
+            </form>
+        </div>
         {% endfor %}
     {% else %}
         <p>No Property Listed.</p>
